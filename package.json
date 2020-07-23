@@ -1,0 +1,26 @@
+{
+  "name": "huluparty-server",
+  "version": "1.0.0",
+  "description": "server for huluparty.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kcharellano/huluparty-server.git"
+  },
+  "keywords": [
+    "server"
+  ],
+  "author": "Kevin Christopher Arellano",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kcharellano/huluparty-server/issues"
+  },
+  "homepage": "https://github.com/kcharellano/huluparty-server#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socketio": "^1.0.0"
+  }
+}
