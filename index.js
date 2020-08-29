@@ -43,20 +43,22 @@ server.listen(3000, () => {
 io.on("connect", (socket) => {
     console.log("A USER HAS CONNECTED TO SOCKET");
     
-    //TODO: santitize input
+    // TODO: santitize input
+    // TODO: Server updates last activity
     // Create new session and emit respective session id.
     socket.on('createSession', (data) => {
-        let newId = uniqueId();
-        newSession = {};
-        newSession["sessionId"] = newId;
-        newSession["lastActivity"] = data["lastActivity"];
-        newSession["lastKnownTime"] = data["lastKnownTime"];
-        newSession["state"] = data["state"];
-        newSession["videoid"] = data["videoid"];
-        sessionDB[newId] = newSession;
+        let id = uniqueId();
+        let newSession = {
+            "sessionId": id,
+            "lastActivity": utcSeconds(),
+            "lastVideoPos": data["lastVideoPos"],
+            "state": data["state"],
+            "videoId": data["videoId"],
+        };
+        sessionDB[id] = newSession;
         console.log("NEW SESSION CREATED!");
         console.log(sessionDB);
-        socket.emit('newSession', newId);
+        socket.emit('newId', id);
     });
 
     // Update all fields from data
@@ -83,13 +85,23 @@ io.on("connect", (socket) => {
     socket.on('getSession', (data) => {
         socket.emit('returnSession', sessionDB[data]);
     });
+
+    socket.on('disconnect', () =>{
+        console.log("USER HAS DISCONNECTED");
+    });
 });
 
-/********************
-    Helper Methods
-********************/
+///////////////////////
+//   HELPER METHODS  //
+///////////////////////
 
 // Create a random 8-byte string
 function uniqueId() {
     return crypto.randomBytes(8).toString('hex');
+}
+
+// return UTC time in seconds
+function utcSeconds() {
+    let d = new Date();
+    return (d.getTime() + d.getTimezoneOffset()*60*1000)/1000;
 }
