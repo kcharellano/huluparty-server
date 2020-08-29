@@ -63,21 +63,23 @@ io.on("connect", (socket) => {
 
     // Update all fields from data
     socket.on('updateSession', (data) => {
-        let updateSession = data["sessionId"];
-        if(sessionDB[updateSession]){
+        let sessionId = data["sessionId"];
+        //if session exists
+        if(sessionDB[sessionId]){
+            //update all values except the session id
             Object.keys(data).forEach((key, index) => {
-                if(key == "sessionId"){
+                if(key === sessionId){
                     return;
                 }
                 else{
-                    sessionDB[updateSession][key] = data[key];
+                    sessionDB[sessionId][key] = data[key];
                 }
             });
             console.log("SESSION UPDATED");
             console.log(sessionDB);
         }
         else{
-            console.log(`Session ${updateSession} does not exist.`);
+            console.log(`Session ${sessionId} does not exist.`);
         }
     });
 
