@@ -21,7 +21,17 @@ const io = socketio(server);
 //   state: 'playing' | 'paused',        // whether the video is playing or paused
 //   videoId: 123                        //  id the video
 // }
-let sessionDB = {}
+var sessionDB = {}
+
+// in-memory store of all the users
+// the keys are the user IDs (strings)
+// the values have the form: {
+//   id: '3d16d961f67e9792',        // 8 random octets
+//   sessionId: 'cba82ca5f59a35e6', // id of the session, if one is joined
+//   socket: <websocket>,           // the websocket
+//   typing: false                  // whether the user is typing or not
+// }
+var userDB = {}
 
 
 /****************
@@ -40,12 +50,23 @@ server.listen(3000, () => {
     SOCKET.IO
 ****************/
 
+// TODO: santitize input
 io.on("connect", (socket) => {
     console.log("A USER HAS CONNECTED TO SOCKET");
+    //create new user object
+    let newUserId = uniqueId();
+    let newUserObj = {
+        "userId": newUserId,
+        "sessionId": null,
+        "socket": socket
+    }
+    // add new user to userDB
+    userDB[newUserId] = newUserObj;
     
-    // TODO: santitize input
-    // TODO: Server updates last activity
-    // Create new session and emit respective session id.
+    //return user Id 
+    socket.emit("newUser", newUserId);
+
+    // Create new session and return session id.
     socket.on('createSession', (data) => {
         let id = uniqueId();
         let newSession = {
@@ -54,25 +75,38 @@ io.on("connect", (socket) => {
             "lastVideoPos": data["lastVideoPos"],
             "state": data["state"],
             "videoId": data["videoId"],
+            "users": [data["user"]]
         };
         sessionDB[id] = newSession;
         console.log("NEW SESSION CREATED!");
         console.log(sessionDB);
-        socket.emit('newId', id);
+        socket.emit('newSession', id);
     });
 
     // Update all fields from data
     socket.on('updateSession', (data) => {
         let sessionId = data["sessionId"];
+        let userId = data["userId"];
         //if session exists
         if(sessionDB[sessionId]){
             //update all values except the session id
             Object.keys(data).forEach((key, index) => {
-                if(key === sessionId){
+                if(key === "sessionId" || key === "userId"){
                     return;
                 }
                 else{
                     sessionDB[sessionId][key] = data[key];
+                }
+            });
+
+            // Propogate updates to all users except sending user
+            sessionDB[sessionId]["users"].forEach((element, index) => {
+                if(element === userId) {
+                    console.log("Fake continue");
+                }
+                else {
+                    let tempSocket = userDB[element]["socket"];
+                    tempSocket.emit("videoUpdate", data)
                 }
             });
             console.log("SESSION UPDATED");
