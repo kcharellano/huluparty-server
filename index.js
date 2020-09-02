@@ -39,7 +39,8 @@ var userDB = {}
 ****************/
 app.get('/', (request, response) =>{
     console.log("GET REQUEST RECEIVED");
-    response.status(200).end();
+    response.redirect("https://www.hulu.com");
+    //response.status(200).end();
 });
 
 server.listen(3000, () => {
@@ -118,14 +119,26 @@ io.on("connect", (socket) => {
     });
 
     // Emit specific session meta-data
-    socket.on('getSession', (data) => {
-        socket.emit('returnSession', sessionDB[data]);
+    socket.on('joinSession', (data) => {
+        //add user to session
+        let newUser = data["userId"];
+        let sessionId = data["sessionId"];
+        sessionDB[sessionId]["users"].push(newUser);
+
+        // send video metadata to sync
+        let syncData = {
+            "lastVideoPos": sessionDB[sessionId]["lastVideoPos"],
+            "state": sessionDB[sessionId]["state"],
+        }
+        socket.emit('returnSession', syncData);
     });
 
     socket.on('disconnect', () =>{
         console.log("USER HAS DISCONNECTED");
     });
 });
+
+//TODO: on disconnect remove users from DB
 
 ///////////////////////
 //   HELPER METHODS  //
