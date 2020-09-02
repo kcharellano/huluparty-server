@@ -123,7 +123,9 @@ io.on("connect", (socket) => {
         //add user to session
         let newUser = data["userId"];
         let sessionId = data["sessionId"];
-        sessionDB[sessionId]["users"].push(newUser);
+        if(!sessionDB[sessionId]["users"].includes(newUser)){
+            sessionDB[sessionId]["users"].push(newUser);
+        }
 
         // send video metadata to sync
         let syncData = {
