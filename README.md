@@ -3,12 +3,9 @@
 
 ## Table of contents
 * [General info](#general-info)
-* [Screenshots](#screenshots)
-* [Technologies](#technologies)
+* [Built-With](#built-with)
 * [Setup](#setup)
-* [Features](#features)
-* [Status](#status)
-* [Inspiration](#inspiration)
+* [Todo](#todo)
 * [Contact](#contact)
 
 ## General info
@@ -18,7 +15,6 @@ The server is the central component of HuluParty. It is responsible for:
 * Synchronizing users with necessary video metadata when they ask to join a specific session
 
 In order for the HuluParty [client](https://github.com/kcharellano/huluparty-client) to work, the server must be running.  
-
 
 ## Built-With
 * Node - 12.16.2
