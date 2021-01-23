@@ -21,6 +21,7 @@
   "homepage": "https://github.com/kcharellano/huluparty-server#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "socket.io-client": "^2.3.0",
     "socketio": "^1.0.0"
   }
 }
